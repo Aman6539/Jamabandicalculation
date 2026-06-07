@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jambandi Land Calculator — ज़मीन हिसाब</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Devanagari+Hindi&family=Playfair+Display:wght@400;700;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1209;
+    --paper: #f5efe0;
+    --aged: #e8dfc4;
+    --rust: #b5451b;
+    --gold: #c9943a;
+    --green: #2d6a4f;
+    --green-light: #52b788;
+    --border: #8b7355;
+    --shadow: rgba(26,18,9,0.15);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 10%, rgba(201,148,58,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 90%, rgba(45,106,79,0.06) 0%, transparent 50%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23f5efe0'/%3E%3Ccircle cx='1' cy='1' r='0.4' fill='%23c9943a' opacity='0.12'/%3E%3C/svg%3E");
+  }
+
+  /* HEADER */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-stripe {
+    background: var(--rust);
+    height: 5px;
+  }
+
+  .header-inner {
+    padding: 28px 40px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .header-emblem {
+    width: 56px; height: 56px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px;
+    flex-shrink: 0;
+    background: rgba(201,148,58,0.1);
+  }
+
+  .header-text h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+  }
+
+  .header-text .subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .header-badge {
+    margin-left: auto;
+    background: var(--rust);
+    color: white;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 2px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* MAIN LAYOUT */
+  .app-container {
+    max-width: 1100px;
+    margin: 36px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+
+  /* PANELS */
+  .panel {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    box-shadow: 4px 4px 0 var(--shadow);
+    overflow: hidden;
+  }
+
+  .panel-header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+
+  .panel-header .icon {
+    font-size: 18px;
+  }
+
+  .panel-header .step-badge {
+    margin-left: auto;
+    background: var(--rust);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+  }
+
+  .panel-body {
+    padding: 24px 20px;
+  }
+
+  /* FORM ELEMENTS */
+  .field-group {
+    margin-bottom: 18px;
+  }
+
+  label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--border);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  input, select {
+    width: 100%;
+    border: 1.5px solid var(--aged);
+    background: var(--paper);
+    padding: 10px 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    color: var(--ink);
+    border-radius: 3px;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--gold);
+    background: white;
+  }
+
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
+  .input-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .unit-label {
+    font-size: 11px;
+    color: var(--border);
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  /* KHASRA TABLE */
+  .khasra-table-wrap {
+    overflow-x: auto;
+    margin-top: 4px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  thead tr {
+    background: var(--aged);
+  }
+
+  th {
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--border);
+    font-weight: 500;
+    border-bottom: 1.5px solid var(--border);
+  }
+
+  td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--aged);
+    vertical-align: middle;
+  }
+
+  tbody tr:hover { background: #fdf8f0; }
+
+  .td-num { font-variant-numeric: tabular-nums; }
+
+  .btn-del {
+    background: none;
+    border: 1px solid #e0c0b0;
+    color: var(--rust);
+    width: 26px; height: 26px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .btn-del:hover { background: #fff0eb; }
+
+  /* BUTTONS */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+    font-weight: 500;
+  }
+
+  .btn:active { transform: translateY(1px); box-shadow: none !important; }
+
+  .btn-primary {
+    background: var(--green);
+    color: white;
+    box-shadow: 3px 3px 0 rgba(45,106,79,0.3);
+  }
+  .btn-primary:hover { background: #245a41; }
+
+  .btn-secondary {
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: 3px 3px 0 var(--shadow);
+  }
+  .btn-secondary:hover { background: #2c2215; }
+
+  .btn-gold {
+    background: var(--gold);
+    color: white;
+    box-shadow: 3px 3px 0 rgba(201,148,58,0.3);
+    width: 100%;
+    justify-content: center;
+    padding: 13px;
+    font-size: 13px;
+  }
+  .btn-gold:hover { background: #b8862e; }
+
+  .btn-rust {
+    background: var(--rust);
+    color: white;
+    box-shadow: 3px 3px 0 rgba(181,69,27,0.3);
+  }
+  .btn-rust:hover { background: #9c3b17; }
+
+  .btn-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* RESULT CARD */
+  .result-panel {
+    grid-column: 1 / -1;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--aged);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .result-cell {
+    background: white;
+    padding: 18px 16px;
+    text-align: center;
+  }
+
+  .result-cell .val {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--green);
+    display: block;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .result-cell .val-unit {
+    font-size: 11px;
+    color: var(--border);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .result-cell.highlight {
+    background: var(--ink);
+  }
+
+  .result-cell.highlight .val {
+    color: var(--gold);
+  }
+
+  .result-cell.highlight .val-unit {
+    color: var(--paper);
+    opacity: 0.6;
+  }
+
+  /* PERSON SUMMARY */
+  .person-card {
+    background: var(--paper);
+    border: 1px solid var(--aged);
+    border-left: 4px solid var(--green);
+    border-radius: 3px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .person-card .person-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    flex: 1;
+  }
+
+  .person-card .person-share {
+    font-size: 12px;
+    color: var(--border);
+    margin-top: 3px;
+  }
+
+  .person-area {
+    text-align: right;
+  }
+
+  .person-area .area-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--rust);
+  }
+
+  .person-area .area-unit {
+    font-size: 10px;
+    color: var(--border);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  /* UNIT CONVERSION INFO */
+  .conversion-box {
+    background: var(--aged);
+    border: 1px dashed var(--border);
+    border-radius: 3px;
+    padding: 14px 16px;
+    font-size: 11px;
+    color: var(--border);
+    line-height: 1.7;
+    margin-top: 16px;
+  }
+
+  .conversion-box strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .section-divider {
+    border: none;
+    border-top: 1px dashed var(--aged);
+    margin: 18px 0;
+  }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--border);
+  }
+
+  .empty-state .icon { font-size: 36px; margin-bottom: 10px; }
+  .empty-state p { font-size: 12px; letter-spacing: 0.05em; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 11px;
+    color: var(--border);
+    letter-spacing: 0.08em;
+    border-top: 1px solid var(--aged);
+    margin-top: 20px;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--green);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    transform: translateY(80px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    z-index: 999;
+  }
+
+  .toast.show {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  @media (max-width: 780px) {
+    .app-container { grid-template-columns: 1fr; }
+    .result-panel { grid-column: 1; }
+    .result-grid { grid-template-columns: repeat(2, 1fr); }
+    .header-inner { padding: 20px; gap: 14px; }
+    .header-badge { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-stripe"></div>
+  <div class="header-inner">
+    <div class="header-emblem">🏛️</div>
+    <div class="header-text">
+      <h1>Jambandi Land Calculator</h1>
+      <div class="subtitle">ज़मीन का हिसाब — Individual Share Calculator</div>
+    </div>
+    <div class="header-badge">Revenue Records</div>
+  </div>
+</header>
+
+<div class="app-container">
+
+  <!-- LEFT: LAND DETAILS -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="icon">📋</span>
+      Land / Khasra Details
+      <span class="step-badge">STEP 1</span>
+    </div>
+    <div class="panel-body">
+
+      <div class="input-row-2">
+        <div class="field-group">
+          <label>Khasra Number</label>
+          <input type="text" id="khasraNo" placeholder="e.g. 123/4">
+        </div>
+        <div class="field-group">
+          <label>Village / Mauza</label>
+          <input type="text" id="village" placeholder="Village name">
+        </div>
+      </div>
+
+      <div class="input-row-2">
+        <div class="field-group">
+          <label>Tehsil</label>
+          <input type="text" id="tehsil" placeholder="Tehsil name">
+        </div>
+        <div class="field-group">
+          <label>District</label>
+          <input type="text" id="district" placeholder="District name">
+        </div>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="field-group">
+        <label>Total Land Area</label>
+        <div class="input-row">
+          <div>
+            <input type="number" id="areaHectare" placeholder="0" min="0" oninput="syncFromHectare()">
+            <div class="unit-label">Hectare</div>
+          </div>
+          <div>
+            <input type="number" id="areaBigha" placeholder="0" min="0" oninput="syncFromBigha()">
+            <div class="unit-label">Bigha</div>
+          </div>
+          <div>
+            <input type="number" id="areaBiswa" placeholder="0" min="0" oninput="syncFromBiswa()">
+            <div class="unit-label">Biswa</div>
+          </div>
+        </div>
+        <div class="input-row" style="margin-top:10px">
+          <div>
+            <input type="number" id="areaAcre" placeholder="0" min="0" oninput="syncFromAcre()">
+            <div class="unit-label">Acre</div>
+          </div>
+          <div>
+            <input type="number" id="areaMarla" placeholder="0" min="0" oninput="syncFromMarla()">
+            <div class="unit-label">Marla</div>
+          </div>
+          <div>
+            <input type="number" id="areaSqft" placeholder="0" min="0" oninput="syncFromSqft()">
+            <div class="unit-label">Sq. Feet</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="conversion-box">
+        <strong>Unit Reference (Approx.):</strong><br>
+        1 Bigha = 20 Biswa &nbsp;|&nbsp; 1 Acre = 4 Bigha (varies by state)<br>
+        1 Hectare ≈ 2.47 Acres &nbsp;|&nbsp; 1 Marla = 272.25 sq.ft<br>
+        1 Acre = 43,560 sq.ft &nbsp;|&nbsp; 1 Biswa ≈ 2,178 sq.ft
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGHT: PERSONS -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="icon">👥</span>
+      Add Co-owners / Hissedars
+      <span class="step-badge">STEP 2</span>
+    </div>
+    <div class="panel-body">
+
+      <div class="input-row-2">
+        <div class="field-group">
+          <label>Person Name</label>
+          <input type="text" id="personName" placeholder="Full name" onkeydown="handleEnter(event)">
+        </div>
+        <div class="field-group">
+          <label>Father / Husband Name</label>
+          <input type="text" id="personParent" placeholder="Father's / Husband's name">
+        </div>
+      </div>
+
+      <div class="input-row-2">
+        <div class="field-group">
+          <label>Share Numerator (Hissa)</label>
+          <input type="number" id="shareNum" placeholder="e.g. 1" min="1">
+        </div>
+        <div class="field-group">
+          <label>Share Denominator (Total)</label>
+          <input type="number" id="shareDen" placeholder="e.g. 4" min="1">
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="addPerson()">➕ Add Person</button>
+        <button class="btn btn-rust" onclick="addEqualShares()">⚖️ Equal Shares</button>
+      </div>
+
+      <hr class="section-divider">
+
+      <div class="khasra-table-wrap">
+        <table id="personTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Name</th>
+              <th>Father/Husband</th>
+              <th>Share</th>
+              <th>%</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="personBody">
+            <tr id="emptyRow">
+              <td colspan="6">
+                <div class="empty-state">
+                  <div class="icon">📝</div>
+                  <p>No hissedars added yet.<br>Add persons above to begin.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="totalShareInfo" style="display:none; margin-top:10px; font-size:11px; letter-spacing:0.06em; padding:8px 12px; border-radius:3px; background: var(--aged);">
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BOTTOM: RESULTS -->
+  <div class="panel result-panel">
+    <div class="panel-header">
+      <span class="icon">📐</span>
+      Individual Land Share Results
+      <span class="step-badge">STEP 3</span>
+    </div>
+    <div class="panel-body">
+
+      <button class="btn btn-gold" onclick="calculate()">
+        🧮 Calculate Individual Shares
+      </button>
+
+      <div id="resultArea" style="margin-top:24px; display:none;">
+
+        <div class="result-grid" id="totalResultGrid">
+          <div class="result-cell highlight">
+            <span class="val" id="resTotalAcre">0</span>
+            <span class="val-unit">Total Acres</span>
+          </div>
+          <div class="result-cell">
+            <span class="val" id="resTotalBigha">0</span>
+            <span class="val-unit">Total Bigha</span>
+          </div>
+          <div class="result-cell">
+            <span class="val" id="resTotalHectare">0</span>
+            <span class="val-unit">Total Hectare</span>
+          </div>
+          <div class="result-cell">
+            <span class="val" id="resTotalSqft">0</span>
+            <span class="val-unit">Total Sq. Feet</span>
+          </div>
+        </div>
+
+        <h3 style="font-family:'Playfair Display',serif; font-size:16px; margin-bottom:14px; color:var(--ink); border-bottom:1px dashed var(--aged); padding-bottom:8px;">
+          🏡 Individual Allocations
+        </h3>
+
+        <div id="personResults"></div>
+
+        <div style="text-align:right; margin-top:16px; display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+          <button class="btn btn-secondary" onclick="printReport()">🖨️ Print Report</button>
+          <button class="btn btn-primary" onclick="clearAll()">🔄 New Calculation</button>
+        </div>
+
+      </div>
+
+      <div id="placeholderMsg" style="text-align:center; padding:36px 20px; color:var(--border);">
+        <div style="font-size:40px; margin-bottom:12px;">⚖️</div>
+        <p style="font-size:12px; letter-spacing:0.06em; line-height:1.8;">
+          Fill in land details and add all hissedars,<br>then click <strong>Calculate</strong> to see individual shares.
+        </p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Jambandi Land Calculator &nbsp;•&nbsp; For Reference Purposes Only &nbsp;•&nbsp; Verify with Official Records
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // --- STATE ---
+  let persons = [];
+  let totalSqft = 0;
+
+  // --- UNIT CONVERSIONS (base: sq.ft) ---
+  const SQFT_PER_ACRE   = 43560;
+  const SQFT_PER_HECTARE = 107639.1;
+  const SQFT_PER_BIGHA  = 27000;   // UP/Bihar standard; ~27,000 sq.ft
+  const SQFT_PER_BISWA  = 1350;    // 1 Bigha = 20 Biswa
+  const SQFT_PER_MARLA  = 272.25;
+
+  function toFixed(val, n=2) {
+    return parseFloat(val.toFixed(n));
+  }
+
+  function sqftFromInputs() {
+    const h = parseFloat(document.getElementById('areaHectare').value) || 0;
+    const bigha = parseFloat(document.getElementById('areaBigha').value) || 0;
+    const biswa = parseFloat(document.getElementById('areaBiswa').value) || 0;
+    const acre = parseFloat(document.getElementById('areaAcre').value) || 0;
+    const marla = parseFloat(document.getElementById('areaMarla').value) || 0;
+    const sf = parseFloat(document.getElementById('areaSqft').value) || 0;
+
+    return (h * SQFT_PER_HECTARE) +
+           (bigha * SQFT_PER_BIGHA) +
+           (biswa * SQFT_PER_BISWA) +
+           (acre * SQFT_PER_ACRE) +
+           (marla * SQFT_PER_MARLA) +
+           sf;
+  }
+
+  function setAllFromSqft(sf, skipId) {
+    if (skipId !== 'areaHectare') document.getElementById('areaHectare').value = sf > 0 ? toFixed(sf / SQFT_PER_HECTARE, 4) : '';
+    if (skipId !== 'areaBigha')   document.getElementById('areaBigha').value   = sf > 0 ? toFixed(sf / SQFT_PER_BIGHA, 3) : '';
+    if (skipId !== 'areaBiswa')   document.getElementById('areaBiswa').value   = sf > 0 ? toFixed(sf / SQFT_PER_BISWA, 2) : '';
+    if (skipId !== 'areaAcre')    document.getElementById('areaAcre').value    = sf > 0 ? toFixed(sf / SQFT_PER_ACRE, 4) : '';
+    if (skipId !== 'areaMarla')   document.getElementById('areaMarla').value   = sf > 0 ? toFixed(sf / SQFT_PER_MARLA, 2) : '';
+    if (skipId !== 'areaSqft')    document.getElementById('areaSqft').value    = sf > 0 ? toFixed(sf, 2) : '';
+  }
+
+  function syncFromHectare() {
+    const sf = (parseFloat(document.getElementById('areaHectare').value) || 0) * SQFT_PER_HECTARE;
+    setAllFromSqft(sf, 'areaHectare');
+  }
+  function syncFromBigha() {
+    const sf = (parseFloat(document.getElementById('areaBigha').value) || 0) * SQFT_PER_BIGHA;
+    setAllFromSqft(sf, 'areaBigha');
+  }
+  function syncFromBiswa() {
+    const sf = (parseFloat(document.getElementById('areaBiswa').value) || 0) * SQFT_PER_BISWA;
+    setAllFromSqft(sf, 'areaBiswa');
+  }
+  function syncFromAcre() {
+    const sf = (parseFloat(document.getElementById('areaAcre').value) || 0) * SQFT_PER_ACRE;
+    setAllFromSqft(sf, 'areaAcre');
+  }
+  function syncFromMarla() {
+    const sf = (parseFloat(document.getElementById('areaMarla').value) || 0) * SQFT_PER_MARLA;
+    setAllFromSqft(sf, 'areaMarla');
+  }
+  function syncFromSqft() {
+    const sf = parseFloat(document.getElementById('areaSqft').value) || 0;
+    setAllFromSqft(sf, 'areaSqft');
+  }
+
+  // --- PERSONS ---
+  function addPerson() {
+    const name = document.getElementById('personName').value.trim();
+    const parent = document.getElementById('personParent').value.trim();
+    const num = parseFloat(document.getElementById('shareNum').value);
+    const den = parseFloat(document.getElementById('shareDen').value);
+
+    if (!name) { showToast('⚠️ Please enter a name'); return; }
+    if (!num || !den || num <= 0 || den <= 0) { showToast('⚠️ Enter valid share (e.g. 1/4)'); return; }
+    if (num > den) { showToast('⚠️ Numerator cannot exceed denominator'); return; }
+
+    persons.push({ name, parent, num, den, id: Date.now() });
+    renderPersonTable();
+
+    document.getElementById('personName').value = '';
+    document.getElementById('personParent').value = '';
+    document.getElementById('shareNum').value = '';
+    document.getElementById('shareDen').value = '';
+    document.getElementById('personName').focus();
+    showToast('✅ ' + name + ' added');
+  }
+
+  function addEqualShares() {
+    const count = parseInt(prompt('How many equal co-owners?', '4'));
+    if (!count || count < 2) { showToast('⚠️ Enter a number ≥ 2'); return; }
+    const names = [];
+    for (let i = 0; i < count; i++) {
+      const n = prompt(`Name of person ${i+1}:`, '');
+      if (!n) { showToast('Cancelled'); return; }
+      names.push(n.trim());
+    }
+    persons = [];
+    names.forEach(n => {
+      persons.push({ name: n, parent: '', num: 1, den: count, id: Date.now() + Math.random() });
+    });
+    renderPersonTable();
+    showToast(`✅ Added ${count} equal co-owners`);
+  }
+
+  function deletePerson(id) {
+    persons = persons.filter(p => p.id !== id);
+    renderPersonTable();
+  }
+
+  function renderPersonTable() {
+    const tbody = document.getElementById('personBody');
+    const infoDiv = document.getElementById('totalShareInfo');
+
+    if (persons.length === 0) {
+      tbody.innerHTML = `<tr id="emptyRow"><td colspan="6"><div class="empty-state"><div class="icon">📝</div><p>No hissedars added yet.<br>Add persons above to begin.</p></div></td></tr>`;
+      infoDiv.style.display = 'none';
+      return;
+    }
+
+    let totalFraction = persons.reduce((sum, p) => sum + p.num / p.den, 0);
+
+    tbody.innerHTML = persons.map((p, i) => {
+      const pct = ((p.num / p.den) * 100).toFixed(2);
+      return `<tr>
+        <td class="td-num">${i+1}</td>
+        <td><strong>${p.name}</strong></td>
+        <td style="color:var(--border); font-size:12px">${p.parent || '—'}</td>
+        <td class="td-num">${p.num}/${p.den}</td>
+        <td class="td-num">${pct}%</td>
+        <td><button class="btn-del" onclick="deletePerson(${p.id})">✕</button></td>
+      </tr>`;
+    }).join('');
+
+    const totalPct = (totalFraction * 100).toFixed(2);
+    const color = Math.abs(totalFraction - 1) < 0.001 ? 'var(--green)' : 'var(--rust)';
+    infoDiv.style.display = 'block';
+    infoDiv.innerHTML = `<span style="color:${color}; font-weight:600;">Total Share: ${totalPct}%</span>${Math.abs(totalFraction - 1) < 0.001 ? ' ✅ Complete' : ' ⚠️ Does not add to 100%'}`;
+  }
+
+  function handleEnter(e) {
+    if (e.key === 'Enter') addPerson();
+  }
+
+  // --- CALCULATE ---
+  function calculate() {
+    const sf = sqftFromInputs();
+    if (sf <= 0) { showToast('⚠️ Please enter total land area'); return; }
+    if (persons.length === 0) { showToast('⚠️ Please add at least one person'); return; }
+
+    totalSqft = sf;
+
+    // Total display
+    document.getElementById('resTotalAcre').textContent    = toFixed(sf / SQFT_PER_ACRE, 4);
+    document.getElementById('resTotalBigha').textContent   = toFixed(sf / SQFT_PER_BIGHA, 3);
+    document.getElementById('resTotalHectare').textContent = toFixed(sf / SQFT_PER_HECTARE, 4);
+    document.getElementById('resTotalSqft').textContent    = Math.round(sf).toLocaleString('en-IN');
+
+    // Individual
+    const container = document.getElementById('personResults');
+    container.innerHTML = '';
+
+    persons.forEach((p, i) => {
+      const ratio = p.num / p.den;
+      const pSf   = sf * ratio;
+      const pAcre = toFixed(pSf / SQFT_PER_ACRE, 4);
+      const pBigha = toFixed(pSf / SQFT_PER_BIGHA, 3);
+      const pBiswa = toFixed(pSf / SQFT_PER_BISWA, 2);
+      const pHect  = toFixed(pSf / SQFT_PER_HECTARE, 4);
+      const pSqftR = Math.round(pSf).toLocaleString('en-IN');
+      const pct    = (ratio * 100).toFixed(2);
+
+      container.innerHTML += `
+        <div class="person-card">
+          <div style="flex:1">
+            <div class="person-name">${p.name}</div>
+            <div class="person-share">${p.parent ? p.parent + ' &nbsp;|&nbsp; ' : ''}Share: ${p.num}/${p.den} (${pct}%)</div>
+            <div style="margin-top:8px; font-size:11px; letter-spacing:0.04em; color:var(--border); display:flex; gap:14px; flex-wrap:wrap;">
+              <span>🌾 <strong style="color:var(--ink)">${pBigha}</strong> Bigha</span>
+              <span>📐 <strong style="color:var(--ink)">${pBiswa}</strong> Biswa</span>
+              <span>🌍 <strong style="color:var(--ink)">${pHect}</strong> Hectare</span>
+              <span>📏 <strong style="color:var(--ink)">${pSqftR}</strong> Sq.ft</span>
+            </div>
+          </div>
+          <div class="person-area">
+            <div class="area-val">${pAcre}</div>
+            <div class="area-unit">Acres</div>
+          </div>
+        </div>
+      `;
+    });
+
+    document.getElementById('resultArea').style.display = 'block';
+    document.getElementById('placeholderMsg').style.display = 'none';
+    document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    showToast('✅ Calculation complete!');
+  }
+
+  // --- PRINT ---
+  function printReport() {
+    const khasra  = document.getElementById('khasraNo').value || 'N/A';
+    const village = document.getElementById('village').value || 'N/A';
+    const tehsil  = document.getElementById('tehsil').value || 'N/A';
+    const district= document.getElementById('district').value || 'N/A';
+    const sf = totalSqft;
+
+    let rows = persons.map((p, i) => {
+      const ratio = p.num / p.den;
+      const pSf   = sf * ratio;
+      return `<tr>
+        <td>${i+1}</td>
+        <td>${p.name}</td>
+        <td>${p.parent || '—'}</td>
+        <td>${p.num}/${p.den}</td>
+        <td>${(ratio*100).toFixed(2)}%</td>
+        <td>${(pSf/SQFT_PER_ACRE).toFixed(4)}</td>
+        <td>${(pSf/SQFT_PER_BIGHA).toFixed(3)}</td>
+        <td>${(pSf/SQFT_PER_BISWA).toFixed(2)}</td>
+        <td>${(pSf/SQFT_PER_HECTARE).toFixed(4)}</td>
+        <td>${Math.round(pSf).toLocaleString('en-IN')}</td>
+      </tr>`;
+    }).join('');
+
+    const w = window.open('', '_blank');
+    w.document.write(`
+      <html><head><title>Jambandi Land Report</title>
+      <style>
+        body { font-family: Georgia, serif; padding: 30px; color: #111; }
+        h1 { text-align:center; font-size:22px; margin-bottom:4px; }
+        .sub { text-align:center; font-size:12px; color:#666; margin-bottom:20px; letter-spacing:0.1em; text-transform:uppercase; }
+        .info { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:12px; margin-bottom:24px; background:#f5f0e8; padding:14px; border:1px solid #ccc; }
+        .info-item label { display:block; font-size:10px; text-transform:uppercase; color:#888; }
+        .info-item span { font-size:15px; font-weight:bold; }
+        table { width:100%; border-collapse:collapse; font-size:12px; }
+        th { background:#1a1209; color:white; padding:8px 10px; text-align:left; }
+        td { padding:7px 10px; border-bottom:1px solid #e5e0d8; }
+        tr:hover td { background:#fdf8f0; }
+        .total-row td { background:#e8dfc4; font-weight:bold; }
+        .footer { margin-top:20px; font-size:10px; color:#999; text-align:center; }
+      </style></head><body>
+      <h1>Jambandi Land Share Report</h1>
+      <div class="sub">Revenue Records — Official Reference Copy</div>
+      <div class="info">
+        <div class="info-item"><label>Khasra No.</label><span>${khasra}</span></div>
+        <div class="info-item"><label>Village</label><span>${village}</span></div>
+        <div class="info-item"><label>Tehsil</label><span>${tehsil}</span></div>
+        <div class="info-item"><label>District</label><span>${district}</span></div>
+      </div>
+      <table>
+        <thead><tr>
+          <th>#</th><th>Name</th><th>Father/Husband</th><th>Share</th><th>%</th>
+          <th>Acres</th><th>Bigha</th><th>Biswa</th><th>Hectare</th><th>Sq.Ft</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr class="total-row">
+          <td colspan="5">TOTAL</td>
+          <td>${(sf/SQFT_PER_ACRE).toFixed(4)}</td>
+          <td>${(sf/SQFT_PER_BIGHA).toFixed(3)}</td>
+          <td>${(sf/SQFT_PER_BISWA).toFixed(2)}</td>
+          <td>${(sf/SQFT_PER_HECTARE).toFixed(4)}</td>
+          <td>${Math.round(sf).toLocaleString('en-IN')}</td>
+        </tr></tfoot>
+      </table>
+      <div class="footer">Generated by Jambandi Land Calculator &nbsp;•&nbsp; For Reference Only &nbsp;•&nbsp; Verify with Official Revenue Records &nbsp;•&nbsp; ${new Date().toLocaleDateString('en-IN')}</div>
+      </body></html>
+    `);
+    w.document.close();
+    w.print();
+  }
+
+  // --- CLEAR ---
+  function clearAll() {
+    if (!confirm('Clear all data and start fresh?')) return;
+    persons = [];
+    totalSqft = 0;
+    document.getElementById('khasraNo').value = '';
+    document.getElementById('village').value = '';
+    document.getElementById('tehsil').value = '';
+    document.getElementById('district').value = '';
+    ['areaHectare','areaBigha','areaBiswa','areaAcre','areaMarla','areaSqft'].forEach(id => document.getElementById(id).value = '');
+    renderPersonTable();
+    document.getElementById('resultArea').style.display = 'none';
+    document.getElementById('placeholderMsg').style.display = 'block';
+    showToast('🔄 Cleared — ready for new entry');
+  }
+
+  // --- TOAST ---
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+</script>
+</body>
+</html>
